@@ -70,10 +70,10 @@ namespace tv {
 
 }
 
-#define TV_MAKE_TYPEVAL(_value) []() {\
+#define TV_MAKE_TYPEVAL(...) []() {\
   struct _typeval_anon {\
     constexpr static decltype(auto) value() {\
-      return _value;\
+      return __VA_ARGS__;\
     }\
   };\
   return typeval<_typeval_anon>();\
