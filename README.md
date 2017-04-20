@@ -3,10 +3,30 @@ typeval
 
 An experiment in constexpr parameters.
 
-Macros to define:
+A note on macro naming: For options, use `TV_OPTION_ON` and `TV_OPTION_OFF`. If
+one defines both, the library will error at you. For standard defaults,
+use `TV_STD_CPPXY`; the default option is `CPP14`. Internal macros are denoted
+by `TV_INTERNAL` - do not touch these.
 
-`TV_USE_CPP11` -- Only use constructs which are legal in C++11
+Options:
 
-`TV_NO_VARIABLE_TEMPLATES` -- Don't define variable templates (`_v` templates)
+* `VARIABLE_TEMPLATES` -- Whether to define variable templates (`_v` templates)
 
-`TV_NO_KEYWORD` -- Don't define `typeval` -- use `TV_MAKE_TYPEVAL` instead
+* `KEYWORD` -- Whether to define `make_typeval` (otherwise, use `TV_MAKE_TYPEVAL`)
+
+* `CONSTEXPR_LAMBDA` -- Whether to make the lambdas constexpr. This is the only
+  way one would be able to use `make_typeval` in a constant expression.
+
+Standard defaults:
+
+* CPP11:
+  * `VARIABLE_TEMPLATES` - off
+  * `CONSTEXPR_LAMBDA` - off
+* CPP14 (default):
+  * `VARIABLE_TEMPLATES` - on
+  * `CONSTEXPR_LAMBDA` - off
+* CPP17
+  * `VARIABLE_TEMPLATES` - on
+  * `CONSTEXPR_LAMBDA` - off
+
+`KEYWORD` is on by default in all standards

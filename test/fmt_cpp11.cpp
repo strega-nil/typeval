@@ -1,4 +1,4 @@
-#define TV_USE_CPP11
+#define TV_STD_CPP11
 #include <tv/typeval.h>
 
 template <typename T>

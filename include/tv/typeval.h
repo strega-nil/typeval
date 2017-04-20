@@ -1,9 +1,10 @@
 #include <cstddef>
 #include <type_traits>
 
-#ifdef TV_USE_CPP11
-#define TV_NO_VARIABLE_TEMPLATES
-#endif
+#ifndef TV_TYPEVAL_H
+#define TV_TYPEVAL_H
+
+#include "_macros.h"
 
 namespace tv {
 
@@ -17,10 +18,10 @@ namespace tv {
     template <typename T, std::size_t N>
     struct is_carray_of<T, T(&)[N]> : std::true_type { };
 
-#ifndef TV_NO_VARIABLE_TEMPLATES
+#if defined(TV_OPTION_ON_VARIABLE_TEMPLATES)
     template <typename Of, typename T>
     static constexpr bool is_carray_of_v = is_carray_of<Of, T>::value;
-#endif // TV_NO_VARIABLE_TEMPLATES
+#endif
   }
 
   template <typename T>
@@ -37,10 +38,10 @@ namespace tv {
   template <typename T>
   struct is_typeval<typeval<T>> : std::true_type { };
 
-#ifndef TV_NO_VARIABLE_TEMPLATES
+#if defined(TV_OPTION_ON_VARIABLE_TEMPLATES)
   template <typename T>
   constexpr static bool is_typeval_v = is_typeval<T>();
-#endif // TV_NO_VARIABLE_TEMPLATES
+#endif
 
   template <typename Of, typename T>
   struct is_typeval_of : std::false_type { };
@@ -50,10 +51,10 @@ namespace tv {
     std::is_same<Of, typename typeval<T>::type>::value
   > { };
 
-#ifndef TV_NO_VARIABLE_TEMPLATES
+#if defined(TV_OPTION_ON_VARIABLE_TEMPLATES)
   template <typename Of, typename T>
   constexpr static bool is_typeval_of_v = is_typeval_of<Of, T>();
-#endif // TV_NO_VARIABLE_TEMPLATES
+#endif
 
   template <typename T>
   struct is_string_constant : std::false_type { };
@@ -63,24 +64,32 @@ namespace tv {
     _impl::is_carray_of<char const, typename typeval<T>::type>::value
   > { };
 
-#ifndef TV_NO_VARIABLE_TEMPLATES
+#if defined(TV_OPTION_ON_VARIABLE_TEMPLATES)
   template <typename T>
   constexpr static bool is_string_constant_v = is_string_constant<T>();
-#endif // TV_NO_VARIABLE_TEMPLATES
+#endif
 
+  namespace _impl {
+    template <typename T>
+    constexpr auto make_typeval_of(T) -> typeval<T> {
+      return typeval<T>();
+    }
+  }
 }
 
-#define TV_MAKE_TYPEVAL(...) []() {\
-  struct _typeval_anon {\
-    constexpr static decltype(auto) value() {\
-      return __VA_ARGS__;\
-    }\
-  };\
-  return typeval<_typeval_anon>();\
-}()
+#define TV_MAKE_TYPEVAL(...) ::tv::_impl::make_typeval_of(\
+  []() TV_INTERNAL_LAMBDA_CONSTEXPR {\
+    struct _typeval_anon {\
+      constexpr static decltype(auto) value() {\
+        return __VA_ARGS__;\
+      }\
+    };\
+    return _typeval_anon();\
+  }()\
+)
 
-#ifndef TV_NO_DEFINE_KEYWORD
-
+#if defined(TV_OPTION_ON_USE_KEYWORD)
 #define make_typeval TV_MAKE_TYPEVAL
+#endif
 
-#endif // TV_NO_DEFINE_KEYWORD
+#endif // TV_TYPEVAL_H
