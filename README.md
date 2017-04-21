@@ -12,6 +12,10 @@ Options:
 
 * `VARIABLE_TEMPLATES` -- Whether to define variable templates (`_v` templates)
 
+* `DECLTYPE_AUTO` -- Whether to use `decltype(auto)`, or `-> decltype(...)`.
+  With the latter, you can't use `typeval` with lambdas, but it's legal under
+  C++11
+
 * `KEYWORD` -- Whether to define `make_typeval` (otherwise, use `TV_MAKE_TYPEVAL`)
 
 * `CONSTEXPR_LAMBDA` -- Whether to make the lambdas constexpr. This is the only
@@ -22,11 +26,14 @@ Standard defaults:
 * CPP11:
   * `VARIABLE_TEMPLATES` - off
   * `CONSTEXPR_LAMBDA` - off
+  * `DECLTYPE_AUTO` - off
 * CPP14 (default):
   * `VARIABLE_TEMPLATES` - on
   * `CONSTEXPR_LAMBDA` - off
+  * `DECLTYPE_AUTO` - on
 * CPP17
   * `VARIABLE_TEMPLATES` - on
   * `CONSTEXPR_LAMBDA` - off
+  * `DECLTYPE_AUTO` - on
 
 `KEYWORD` is on by default in all standards

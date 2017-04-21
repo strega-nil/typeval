@@ -25,59 +25,60 @@ namespace tv {
   }
 
   template <typename T>
-  struct typeval {
+  struct constant {
     using value_type = decltype(T::value());
-    using type = typeval<T>;
+    using type = constant<T>;
     constexpr static value_type value = T::value();
     constexpr operator value_type() const noexcept { return value; }
     constexpr auto operator()() const noexcept -> value_type { return value; }
   };
 
   template <typename T>
-  struct is_typeval : std::false_type { };
+  struct is_constant_type : std::false_type { };
   template <typename T>
-  struct is_typeval<typeval<T>> : std::true_type { };
+  struct is_constant_type<constant<T>> : std::true_type { };
 
 #if defined(TV_OPTION_ON_VARIABLE_TEMPLATES)
   template <typename T>
-  constexpr static bool is_typeval_v = is_typeval<T>();
+  constexpr static bool is_constant_type_v = is_constant_type<T>();
 #endif
 
   template <typename Of, typename T>
-  struct is_typeval_of : std::false_type { };
+  struct is_constant_type_of : std::false_type { };
   template <typename Of, typename T>
-  struct is_typeval_of<Of, typeval<T>> : std::integral_constant<
+  struct is_constant_type_of<Of, constant<T>> : std::integral_constant<
     bool,
-    std::is_same<Of, typename typeval<T>::type>::value
+    std::is_same<Of, typename constant<T>::value_type>::value
   > { };
 
 #if defined(TV_OPTION_ON_VARIABLE_TEMPLATES)
   template <typename Of, typename T>
-  constexpr static bool is_typeval_of_v = is_typeval_of<Of, T>();
+  constexpr static bool is_constant_type_of_v = is_constant_type_of<Of, T>();
 #endif
 
   template <typename T>
-  struct is_string_constant : std::false_type { };
+  struct is_constant_string : std::false_type { };
   template <typename T>
-  struct is_string_constant<typeval<T>> : std::integral_constant<
+  struct is_constant_string<constant<T>> : std::integral_constant<
     bool,
-    _impl::is_carray_of<char const, typename typeval<T>::type>::value
+    _impl::is_carray_of<char const, typename constant<T>::value_type>::value
   > { };
 
 #if defined(TV_OPTION_ON_VARIABLE_TEMPLATES)
   template <typename T>
-  constexpr static bool is_string_constant_v = is_string_constant<T>();
+  constexpr static bool is_constant_string_v = is_constant_string<T>();
 #endif
 
   namespace _impl {
     template <typename T>
-    constexpr auto make_typeval_of(T) -> typeval<T> {
-      return typeval<T>();
+    constexpr auto make_constant_of(T) -> constant<T> {
+      return constant<T>();
     }
   }
 }
 
-#define TV_MAKE_TYPEVAL(...) ::tv::_impl::make_typeval_of(\
+#ifdef TV_OPTION_ON_DECLTYPE_AUTO
+#define TV_MAKE_TYPEVAL(...) ::tv::_impl::make_constant_of(\
   []() TV_INTERNAL_LAMBDA_CONSTEXPR {\
     struct _typeval_anon {\
       constexpr static decltype(auto) value() {\
@@ -87,9 +88,21 @@ namespace tv {
     return _typeval_anon();\
   }()\
 )
+#else
+#define TV_MAKE_TYPEVAL(...) ::tv::_impl::make_constant_of(\
+  []() TV_INTERNAL_LAMBDA_CONSTEXPR {\
+    struct _typeval_anon {\
+      constexpr static decltype(__VA_ARGS__) value() {\
+        return __VA_ARGS__;\
+      }\
+    };\
+    return _typeval_anon();\
+  }()\
+)
+#endif
 
-#if defined(TV_OPTION_ON_USE_KEYWORD)
-#define make_typeval TV_MAKE_TYPEVAL
+#if defined(TV_OPTION_ON_KEYWORD)
+#define typeval TV_MAKE_TYPEVAL
 #endif
 
 #endif // TV_TYPEVAL_H
