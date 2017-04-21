@@ -68,6 +68,8 @@
     && !defined(TV_OPTION_OFF_DECLTYPE_AUTO)
     #define TV_OPTION_ON_DECLTYPE_AUTO
   #endif
+#else
+#error "Internal error: no standards defined. Please report."
 #endif
 
 

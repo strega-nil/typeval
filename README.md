@@ -33,7 +33,7 @@ Standard defaults:
   * `DECLTYPE_AUTO` - on
 * CPP17
   * `VARIABLE_TEMPLATES` - on
-  * `CONSTEXPR_LAMBDA` - off
+  * `CONSTEXPR_LAMBDA` - on
   * `DECLTYPE_AUTO` - on
 
 `KEYWORD` is on by default in all standards
